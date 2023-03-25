@@ -10,8 +10,8 @@ export class NavComponent {
 
   constructor(public modal:ModalService ) { }
 
-  openModal($event:Event){
+  openModal($event:Event, id:string){
     $event.preventDefault();
-    this.modal.toggleModal();
+    this.modal.toggleModal(id);
   }
 }
