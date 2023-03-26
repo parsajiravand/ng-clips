@@ -1,0 +1,55 @@
+<!-- Registration Form -->
+<form [formGroup]="registerForm">
+  <!-- Name -->
+  <div class="mb-3">
+    <app-input label="Name" [control]="registerForm.controls.name"></app-input>
+  </div>
+  <!-- Email -->
+  <div class="mb-3">
+    <app-input
+      label="Email"
+      type="email"
+      [control]="registerForm.controls.email"
+    ></app-input>
+  </div>
+  <!-- Age -->
+  <div class="mb-3">
+    <app-input
+      label="Age"
+      type="number"
+      [control]="registerForm.controls.age"
+    ></app-input>
+  </div>
+  <!-- Password -->
+  <div class="mb-3">
+    <app-input
+      label="Password"
+      type="password"
+      [control]="registerForm.controls.password"
+    ></app-input>
+  </div>
+  <!-- Confirm Password -->
+  <div class="mb-3">
+    <app-input
+      label="Confirm Password"
+      type="password"
+      [control]="registerForm.controls.confirmPassword"
+    ></app-input>
+  </div>
+  <!-- Phone Number -->
+  <div class="mb-3">
+    <label class="inline-block mb-2">Phone Number</label>
+    <input
+      formControlName="phoneNumber"
+      type="text"
+      class="block w-full py-1.5 px-3 text-gray-200 border border-gray-400 transition duration-500 focus:outline-none rounded bg-transparent focus:border-indigo-400"
+      placeholder="Enter Phone Number"
+    />
+  </div>
+  <button
+    type="submit"
+    class="block w-full bg-indigo-400 text-white py-1.5 px-3 rounded transition hover:bg-indigo-500"
+  >
+    Submit
+  </button>
+</form>
