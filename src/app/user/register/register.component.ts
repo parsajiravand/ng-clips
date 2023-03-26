@@ -6,6 +6,10 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
+  showAlert = false;
+  alertMsg = 'Please wait! We are processing your request...';
+  alertColor = 'blue';
+
   name = new FormControl('', [Validators.required, Validators.minLength(3)]);
   email = new FormControl('', [Validators.required, Validators.email]);
   age = new FormControl('', [
@@ -41,6 +45,8 @@ export class RegisterComponent {
   });
 
   register() {
-    console.log(this.registerForm.value);
+    this.showAlert = true;
+    this.alertMsg = 'Please wait! We are processing your request...';
+    this.alertColor = 'blue';
   }
 }
