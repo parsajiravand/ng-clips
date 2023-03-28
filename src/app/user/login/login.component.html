@@ -1,27 +1,48 @@
-      <!-- Login Form -->
-      <form>
-        <!-- Email -->
-        <div class="mb-3">
-          <label class="inline-block mb-2">Email</label>
-          <input
-            type="email"
-            class="block w-full py-1.5 px-3 text-gray-200 border border-gray-400 transition duration-500 focus:outline-none rounded bg-transparent focus:border-indigo-400"
-            placeholder="Enter Email"
-          />
-        </div>
-        <!-- Password -->
-        <div class="mb-3">
-          <label class="inline-block mb-2">Password</label>
-          <input
-            type="password"
-            class="block w-full py-1.5 px-3 text-gray-200 border border-gray-400 transition duration-500 focus:outline-none rounded bg-transparent focus:border-indigo-400"
-            placeholder="Password"
-          />
-        </div>
-        <button
-          type="submit"
-          class="block w-full bg-indigo-400 text-white py-1.5 px-3 rounded transition hover:bg-indigo-500"
-        >
-          Submit
-        </button>
-      </form>
+<!-- Login Form -->
+<form #loginForm="ngForm" (ngSubmit)="login()">
+  <!-- Email -->
+  <div class="mb-3">
+    <label class="inline-block mb-2">Email</label>
+    <input
+      name="email"
+      #email="ngModel"
+      [(ngModel)]="user.email"
+      type="email"
+      class="block w-full py-1.5 px-3 text-gray-200 border border-gray-400 transition duration-500 focus:outline-none rounded bg-transparent focus:border-indigo-400"
+      placeholder="Enter Email"
+      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+    />
+    <p
+      *ngIf="email.errors && email.invalid && email.dirty"
+      class="text-red-500 text-xs"
+    >
+      Please enter a valid email address
+    </p>
+  </div>
+  <!-- Password -->
+  <div class="mb-3">
+    <label class="inline-block mb-2">Password</label>
+    <input
+      #password="ngModel"
+      name="password"
+      [(ngModel)]="user.password"
+      type="password"
+      class="block w-full py-1.5 px-3 text-gray-200 border border-gray-400 transition duration-500 focus:outline-none rounded bg-transparent focus:border-indigo-400"
+      placeholder="Password"
+      required
+    />
+    <p
+      *ngIf="password.errors && password.invalid && password.dirty"
+      class="text-red-500 text-xs"
+    >
+      Please enter a password
+    </p>
+  </div>
+  <button
+    type="submit"
+    class="block w-full bg-indigo-400 text-white py-1.5 px-3 rounded transition hover:bg-indigo-500 disabled:opacity-50 disabled:bg-indigo-400"
+    [disabled]="loginForm.invalid"
+  >
+    Submit
+  </button>
+</form>
