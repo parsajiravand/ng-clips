@@ -1,11 +1,16 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
+  constructor(private auth: AngularFireAuth, private db: AngularFirestore) {}
+
+  submitLoading = false;
   showAlert = false;
   alertMsg = 'Please wait! We are processing your request...';
   alertColor = 'blue';
@@ -44,9 +49,39 @@ export class RegisterComponent {
     phoneNumber: this.phoneNumber,
   });
 
-  register() {
+  async register() {
     this.showAlert = true;
     this.alertMsg = 'Please wait! We are processing your request...';
     this.alertColor = 'blue';
+    this.submitLoading = true;
+    const { email, password } = this.registerForm.value;
+    try {
+      const userCred = await this.auth.createUserWithEmailAndPassword(
+        email as string,
+        password as string
+      );
+      await this.db
+        .collection('users')
+        .add({
+          name: this.registerForm.value.name,
+          age: this.registerForm.value.age,
+          email: this.registerForm.value.email,
+          phoneNumber: this.registerForm.value.phoneNumber,
+        });
+      console.log(userCred);
+      this.submitLoading = false;
+
+    } catch (error: any) {
+      console.log(error);
+
+      this.alertMsg = error.message || 'Something went wrong!';
+      this.alertColor = 'red';
+      this.submitLoading = false;
+
+      return;
+    }
+
+    this.alertMsg = 'Registration successful!';
+    this.alertColor = 'green';
   }
 }
