@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import IUser from 'src/app/models/user.model';
+import { AuthService } from 'src/app/services/auth.service';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
-  constructor(private auth: AngularFireAuth, private db: AngularFirestore) {}
+  constructor(private auth: AuthService) {}
 
   submitLoading = false;
   showAlert = false;
@@ -17,7 +18,7 @@ export class RegisterComponent {
 
   name = new FormControl('', [Validators.required, Validators.minLength(3)]);
   email = new FormControl('', [Validators.required, Validators.email]);
-  age = new FormControl('', [
+  age = new FormControl<number | null>(null, [
     Validators.required,
     Validators.min(18),
     Validators.max(140),
@@ -54,23 +55,8 @@ export class RegisterComponent {
     this.alertMsg = 'Please wait! We are processing your request...';
     this.alertColor = 'blue';
     this.submitLoading = true;
-    const { email, password } = this.registerForm.value;
     try {
-      const userCred = await this.auth.createUserWithEmailAndPassword(
-        email as string,
-        password as string
-      );
-      await this.db
-        .collection('users')
-        .add({
-          name: this.registerForm.value.name,
-          age: this.registerForm.value.age,
-          email: this.registerForm.value.email,
-          phoneNumber: this.registerForm.value.phoneNumber,
-        });
-      console.log(userCred);
-      this.submitLoading = false;
-
+      await this.auth.createUser(this.registerForm.value as IUser);
     } catch (error: any) {
       console.log(error);
 
