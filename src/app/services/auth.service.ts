@@ -41,4 +41,15 @@ export class AuthService {
       displayName: userData.name,
     });
   }
+
+  public async loginUser(userData: { email: string; password: string }) {
+    if (!userData.password) throw new Error('Password is required!');
+
+    const userCred = await this.auth.signInWithEmailAndPassword(
+      userData.email as string,
+      userData.password as string
+    );
+
+    if (!userCred.user) throw new Error('User not found!');
+  }
 }
