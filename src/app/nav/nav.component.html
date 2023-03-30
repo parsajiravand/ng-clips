@@ -29,7 +29,14 @@
             >
           </li>
           <li>
-            <a class="px-2" href="#">Upload</a>
+            <a
+              class="px-2"
+              href="#"
+              routerLink="/upload"
+              routerLinkActive="text-indigo-400"
+              [routerLinkActiveOptions]="{ exact: true }"
+              >Upload</a
+            >
           </li>
           <li>
             <a class="px-2 cursor-pointer" (click)="auth.logout()">Logout</a>
