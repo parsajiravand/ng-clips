@@ -4,7 +4,8 @@ import {
   AngularFirestore,
   AngularFirestoreCollection,
 } from '@angular/fire/compat/firestore';
-import { delay, map, Observable } from 'rxjs';
+import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
+import { delay, filter, map, Observable, of, switchMap } from 'rxjs';
 import IUser from '../models/user.model';
 @Injectable({
   providedIn: 'root',
@@ -12,13 +13,39 @@ import IUser from '../models/user.model';
 export class AuthService {
   private userCollection = {} as AngularFirestoreCollection<IUser>;
   public isAuthenticated$: Observable<boolean>;
-  public isAuthenticatedWithDelay$ : Observable<boolean> 
+  public isAuthenticatedWithDelay$: Observable<boolean>;
+  private redirect = false;
 
-  constructor(private auth: AngularFireAuth, private db: AngularFirestore) {
+  constructor(
+    private auth: AngularFireAuth,
+    private db: AngularFirestore,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.userCollection = this.db.collection('users');
     auth.user.subscribe(console.log);
     this.isAuthenticated$ = auth.user.pipe(map((user) => !!user));
     this.isAuthenticatedWithDelay$ = this.isAuthenticated$.pipe(delay(1000));
+
+    // this.route.data.subscribe((data) => {
+    //   if (data.authOnly) {
+    //     this.isAuthenticatedWithDelay$.subscribe((isAuthenticated) => {
+    //       if (!isAuthenticated) {
+    //         this.router.navigateByUrl('/login');
+    //       }
+    //     });
+    //   }
+    // });
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof ActivationEnd),
+        map((e) => this.route.firstChild),
+        switchMap((route) => route?.data ?? of({}))
+      )
+      .subscribe((data) => {
+        this.redirect = data['authOnly'] ?? false;
+        console.log(data);
+      });
   }
 
   public async createUser(userData: IUser) {
@@ -53,5 +80,11 @@ export class AuthService {
     );
 
     if (!userCred.user) throw new Error('User not found!');
+  }
+
+  public async logout() {
+    await this.auth.signOut();
+
+    if (this.redirect) await this.router.navigateByUrl('/');
   }
 }
