@@ -29,9 +29,9 @@
   <!-- User's Video Section -->
   <div class="container mx-auto my-8">
     <!-- Video List -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" >
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div
-      *ngFor="let clip of clips"
+        *ngFor="let clip of clips"
         class="mt-6 rounded-tl-2xl rounded-br-2xl shadow-xl bg-secondary flex flex-col justify-start"
       >
         <!-- Image -->
@@ -45,7 +45,7 @@
         <!-- Body -->
         <div class="p-6 text-2xl">
           <!-- Link -->
-          <a href="#" class="font-bold mb-2"> {{clip.title}} </a>
+          <a href="#" class="font-bold mb-2"> {{ clip.title }} </a>
           <a
             href="#"
             class="bg-gray-400 text-white px-2 py-1 ml-2 text-sm rounded"
@@ -59,23 +59,21 @@
           <a
             href="#"
             class="flex-1 p-2 border-right border-r-2 border-gray-700 transition hover:text-indigo-400"
-            (click)="openModal($event,clip)"
+            (click)="openModal($event, clip)"
           >
             <span class="material-icons text-base">build</span>
           </a>
           <a
             href="#"
+            (click)="deleteClip($event, clip)"
             class="flex-1 p-2 rounded-br-2xl transition hover:text-indigo-400"
           >
             <span class="material-icons text-base">delete</span>
           </a>
         </div>
       </div>
-
     </div>
   </div>
 
   <app-edit [activeClip]="activeClip" (update)="update($event)"></app-edit>
-
-
 </div>
