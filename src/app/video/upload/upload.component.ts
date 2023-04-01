@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { last, switchMap } from 'rxjs';
 import { v4 as uuid } from 'uuid';
-
+import firebase from 'firebase/compat/app';
+import { ClipService } from 'src/app/services/clip.service';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -23,8 +26,21 @@ export class UploadComponent {
 
   // upload progress
   percentage = 0;
+  showPercentage = false;
 
-  constructor(private storage: AngularFireStorage) {}
+  //user
+
+  user: firebase.User | null = null;
+
+  constructor(
+    private storage: AngularFireStorage,
+    private auth: AngularFireAuth,
+    private clipService: ClipService
+  ) {
+    auth.user.subscribe((user) => {
+      this.user = user;
+    });
+  }
 
   title = new FormControl('', {
     validators: [Validators.required, Validators.minLength(3)],
@@ -37,10 +53,11 @@ export class UploadComponent {
 
   // Drag and drop file upload functions below here
   storeFile($event: Event) {
+    console.log($event);
     this.isDragover = false;
-    this.file = ($event as DragEvent).dataTransfer ?
-      ($event as DragEvent).dataTransfer?.files.item(0) ?? null :
-      ($event.target as HTMLInputElement).files?.item(0) ?? null
+    this.file = ($event as DragEvent).dataTransfer
+      ? ($event as DragEvent).dataTransfer?.files.item(0) ?? null
+      : ($event.target as HTMLInputElement).files?.item(0) ?? null;
 
     if (!this.file || this.file.type !== 'video/mp4') {
       return;
@@ -51,21 +68,59 @@ export class UploadComponent {
 
   // Upload file to firebase storage
   uploadFile() {
+    this.uploadForm.disable();
     this.showAlert = true;
     this.alertMsg = 'Please wait! We are processing your request...';
     this.alertColor = 'blue';
     this.inSubmission = true;
+    this.showPercentage = true;
     // Create a unique file name
     const fileName = uuid();
     const clipPath = `clips/${fileName}.mp4`;
 
-    console.log(this.file, this.title.value, clipPath)
+    console.log(this.file, this.title.value, clipPath);
 
     // Upload file to firebase storage
-   const task = this.storage.upload(clipPath, this.file);
-   task.percentageChanges().subscribe((percentage) => {
+    const task = this.storage.upload(clipPath, this.file);
+    const clipRef = this.storage.ref(clipPath);
+    task.percentageChanges().subscribe((percentage) => {
       console.log(percentage);
-      this.percentage = percentage as number / 100;
-    }
+      this.percentage = (percentage as number) / 100;
+    });
+
+    // Get notified when the download URL is available
+    task
+      .snapshotChanges()
+      .pipe(
+        last(),
+        switchMap(() => clipRef.getDownloadURL())
+      )
+      .subscribe({
+        next: (url) => {
+          const clip = {
+            uid: this.user?.uid as string,
+            title: this.title.value,
+            displayName: this.user?.displayName as string,
+            fileName: `${fileName}.mp4`,
+            url,
+          };
+          this.clipService.createClip(clip);
+          this.showAlert = true;
+          this.alertMsg = 'File uploaded successfully!';
+          this.alertColor = 'green';
+          this.inSubmission = false;
+          this.showPercentage = false;
+        },
+        error: (err) => {
+          this.uploadForm.enable();
+
+          this.showAlert = true;
+          this.alertMsg = err.message;
+          this.alertColor = 'red';
+          this.showPercentage = false;
+          this.inSubmission = false;
+          console.error(err);
+        },
+      });
   }
 }
