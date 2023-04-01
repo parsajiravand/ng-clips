@@ -1,17 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+import {
+  AngularFireStorage,
+  AngularFireUploadTask,
+} from '@angular/fire/compat/storage';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { last, switchMap } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 import firebase from 'firebase/compat/app';
 import { ClipService } from 'src/app/services/clip.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
 })
-export class UploadComponent {
+export class UploadComponent implements OnDestroy {
   isDragover = false;
   file: File | null = null;
   nextStep = false;
@@ -29,13 +33,16 @@ export class UploadComponent {
   showPercentage = false;
 
   //user
-
   user: firebase.User | null = null;
+
+  //task
+  task?: AngularFireUploadTask;
 
   constructor(
     private storage: AngularFireStorage,
     private auth: AngularFireAuth,
-    private clipService: ClipService
+    private clipService: ClipService,
+    private router: Router
   ) {
     auth.user.subscribe((user) => {
       this.user = user;
@@ -96,7 +103,7 @@ export class UploadComponent {
         switchMap(() => clipRef.getDownloadURL())
       )
       .subscribe({
-        next: (url) => {
+        next: async (url) => {
           const clip = {
             uid: this.user?.uid as string,
             title: this.title.value,
@@ -104,12 +111,19 @@ export class UploadComponent {
             fileName: `${fileName}.mp4`,
             url,
           };
-          this.clipService.createClip(clip);
+
+          // clip service
+          const clipDocRef = await this.clipService.createClip(clip);
+
           this.showAlert = true;
           this.alertMsg = 'File uploaded successfully!';
           this.alertColor = 'green';
           this.inSubmission = false;
           this.showPercentage = false;
+
+          setTimeout(() => {
+            this.router.navigate(['clip', clipDocRef.id])
+          }, 1000);
         },
         error: (err) => {
           this.uploadForm.enable();
@@ -122,5 +136,9 @@ export class UploadComponent {
           console.error(err);
         },
       });
+  }
+
+  ngOnDestroy(): void {
+    this.task?.cancel();
   }
 }
