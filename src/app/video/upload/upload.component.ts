@@ -106,7 +106,6 @@ export class UploadComponent implements OnDestroy {
 
     this.screenshotTask = this.storage.upload(screenshotPath, screenshotBlob);
 
-    console.log(this.file, this.title.value, clipPath);
 
     // Upload file to firebase storage
     const task = this.storage.upload(clipPath, this.file);
