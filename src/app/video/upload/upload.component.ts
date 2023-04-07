@@ -5,7 +5,7 @@ import {
   AngularFireUploadTask,
 } from '@angular/fire/compat/storage';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { last, switchMap } from 'rxjs';
+import { switchMap, combineLatest, forkJoin } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 import firebase from 'firebase/compat/app';
 import { ClipService } from 'src/app/services/clip.service';
@@ -41,8 +41,9 @@ export class UploadComponent implements OnDestroy {
 
   // screenshot
   screenshots: string[] = [];
-  selectedScreenshot:string = '0'
+  selectedScreenshot: string = '0';
   selectedScreenshotIndex = 0;
+  screenshotTask?: AngularFireUploadTask;
 
   constructor(
     private storage: AngularFireStorage,
@@ -87,7 +88,7 @@ export class UploadComponent implements OnDestroy {
   }
 
   // Upload file to firebase storage
-  uploadFile() {
+  async uploadFile() {
     this.uploadForm.disable();
     this.showAlert = true;
     this.alertMsg = 'Please wait! We are processing your request...';
@@ -98,23 +99,34 @@ export class UploadComponent implements OnDestroy {
     const fileName = uuid();
     const clipPath = `clips/${fileName}.mp4`;
 
+    const screenshotBlob = await this.ffmpegService.blobFromURL(
+      this.selectedScreenshot
+    );
+    const screenshotPath = `screenshots/${fileName}.png`;
+
+    this.screenshotTask = this.storage.upload(screenshotPath, screenshotBlob);
+
     console.log(this.file, this.title.value, clipPath);
 
     // Upload file to firebase storage
     const task = this.storage.upload(clipPath, this.file);
     const clipRef = this.storage.ref(clipPath);
-    task.percentageChanges().subscribe((percentage) => {
-      console.log(percentage);
-      this.percentage = (percentage as number) / 100;
+    combineLatest([
+      task.percentageChanges(),
+      this.screenshotTask.percentageChanges(),
+    ]).subscribe((percentage) => {
+      const [clipPercentage, screenshotPercentage] = percentage;
+      if (!clipPercentage || !screenshotPercentage) {
+        return;
+      }
+
+      const total = clipPercentage + screenshotPercentage;
+      this.percentage = (total as number) / 200;
     });
 
     // Get notified when the download URL is available
-    task
-      .snapshotChanges()
-      .pipe(
-        last(),
-        switchMap(() => clipRef.getDownloadURL())
-      )
+    forkJoin([task.snapshotChanges(), this.screenshotTask.snapshotChanges()])
+      .pipe(switchMap(() => clipRef.getDownloadURL()))
       .subscribe({
         next: async (url) => {
           const clip = {
@@ -152,10 +164,9 @@ export class UploadComponent implements OnDestroy {
       });
   }
   selectScreen(index: number) {
-    this.selectedScreenshotIndex = index
+    this.selectedScreenshotIndex = index;
     this.selectedScreenshot = this.screenshots[index];
     console.log('select screen', this.selectedScreenshot);
-
   }
 
   ngOnDestroy(): void {

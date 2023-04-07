@@ -60,9 +60,15 @@ export class FfmpegService {
 
       screenshots.push(screenshotUrl);
     });
-    
+
     this.isRunning = false;
     
     return screenshots;
+  }
+
+  async blobFromURL(url:string){
+    const response = await fetch(url);
+    const data = await response.blob();
+    return data;
   }
 }
