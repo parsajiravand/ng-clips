@@ -106,6 +106,7 @@ export class UploadComponent implements OnDestroy {
 
     this.screenshotTask = this.storage.upload(screenshotPath, screenshotBlob);
 
+    const screenshotRef = this.storage.ref(screenshotPath);
 
     // Upload file to firebase storage
     const task = this.storage.upload(clipPath, this.file);
@@ -125,15 +126,21 @@ export class UploadComponent implements OnDestroy {
 
     // Get notified when the download URL is available
     forkJoin([task.snapshotChanges(), this.screenshotTask.snapshotChanges()])
-      .pipe(switchMap(() => clipRef.getDownloadURL()))
+      .pipe(
+        switchMap(() =>
+          forkJoin([clipRef.getDownloadURL(), screenshotRef.getDownloadURL()])
+        )
+      )
       .subscribe({
         next: async (url) => {
+          const [clipUrl, screenshotUrl] = url;
           const clip = {
             uid: this.user?.uid as string,
             title: this.title.value,
             displayName: this.user?.displayName as string,
             fileName: `${fileName}.mp4`,
-            url,
+            url: clipUrl,
+            screenshotUrl: screenshotUrl,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
           };
 
