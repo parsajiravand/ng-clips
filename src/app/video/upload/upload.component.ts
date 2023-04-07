@@ -39,17 +39,20 @@ export class UploadComponent implements OnDestroy {
   //task
   task?: AngularFireUploadTask;
 
+  // screenshot
+  screenshots: string[] = [];
+
   constructor(
     private storage: AngularFireStorage,
     private auth: AngularFireAuth,
     private clipService: ClipService,
     private router: Router,
-    public ffmpegService:FfmpegService
+    public ffmpegService: FfmpegService
   ) {
     auth.user.subscribe((user) => {
       this.user = user;
     });
-    this.ffmpegService.init()
+    this.ffmpegService.init();
   }
 
   title = new FormControl('', {
@@ -71,7 +74,7 @@ export class UploadComponent implements OnDestroy {
     if (!this.file || this.file.type !== 'video/mp4') {
       return;
     }
-    await this.ffmpegService.getScreenshots(this.file)
+    this.screenshots = await this.ffmpegService.getScreenshots(this.file);
     this.title.setValue(this.file.name.replace(/\.[^/.]+$/, ''));
     this.nextStep = true;
   }
@@ -126,7 +129,7 @@ export class UploadComponent implements OnDestroy {
           this.showPercentage = false;
 
           setTimeout(() => {
-            this.router.navigate(['clip', clipDocRef.id])
+            this.router.navigate(['clip', clipDocRef.id]);
           }, 1000);
         },
         error: (err) => {

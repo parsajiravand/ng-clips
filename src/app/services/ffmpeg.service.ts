@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { promises } from 'dns';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,7 @@ export class FfmpegService {
     this.isReady = true;
   }
 
-  async getScreenshots(file: File) {
+  async getScreenshots(file: File): Promise<string[]> {
     const data = await fetchFile(file);
     this.ffmpeg.FS('writeFile', file.name, data);
 
@@ -56,8 +57,7 @@ export class FfmpegService {
       const screenshotUrl = URL.createObjectURL(screenshotBlob);
 
       screenshots.push(screenshotUrl);
-    
-      return screenshots;
     });
+    return screenshots;
   }
 }
