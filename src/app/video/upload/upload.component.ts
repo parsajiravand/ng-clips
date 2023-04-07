@@ -41,6 +41,8 @@ export class UploadComponent implements OnDestroy {
 
   // screenshot
   screenshots: string[] = [];
+  selectedScreenshot:string = '0'
+  selectedScreenshotIndex = 0;
 
   constructor(
     private storage: AngularFireStorage,
@@ -66,6 +68,9 @@ export class UploadComponent implements OnDestroy {
 
   // Drag and drop file upload functions below here
   async storeFile($event: Event) {
+    if (this.ffmpegService.isRunning) {
+      return;
+    }
     this.isDragover = false;
     this.file = ($event as DragEvent).dataTransfer
       ? ($event as DragEvent).dataTransfer?.files.item(0) ?? null
@@ -75,6 +80,8 @@ export class UploadComponent implements OnDestroy {
       return;
     }
     this.screenshots = await this.ffmpegService.getScreenshots(this.file);
+    this.selectedScreenshot = this.screenshots[this.selectedScreenshotIndex];
+
     this.title.setValue(this.file.name.replace(/\.[^/.]+$/, ''));
     this.nextStep = true;
   }
@@ -143,6 +150,12 @@ export class UploadComponent implements OnDestroy {
           console.error(err);
         },
       });
+  }
+  selectScreen(index: number) {
+    this.selectedScreenshotIndex = index
+    this.selectedScreenshot = this.screenshots[index];
+    console.log('select screen', this.selectedScreenshot);
+
   }
 
   ngOnDestroy(): void {

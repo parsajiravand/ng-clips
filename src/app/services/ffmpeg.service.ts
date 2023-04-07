@@ -7,6 +7,7 @@ import { promises } from 'dns';
 })
 export class FfmpegService {
   isReady = false;
+  isRunning = false;
   private ffmpeg;
   constructor() {
     this.ffmpeg = createFFmpeg({ log: true });
@@ -23,6 +24,7 @@ export class FfmpegService {
   }
 
   async getScreenshots(file: File): Promise<string[]> {
+    this.isRunning = true;
     const data = await fetchFile(file);
     this.ffmpeg.FS('writeFile', file.name, data);
 
@@ -58,6 +60,9 @@ export class FfmpegService {
 
       screenshots.push(screenshotUrl);
     });
+    
+    this.isRunning = false;
+    
     return screenshots;
   }
 }
