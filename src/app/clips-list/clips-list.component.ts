@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ClipService } from '../services/clip.service';
 import { BehaviorSubject } from 'rxjs';
 import { DatePipe } from '@angular/common';
@@ -7,22 +14,25 @@ import { DatePipe } from '@angular/common';
   selector: 'app-clips-list',
   templateUrl: './clips-list.component.html',
   styleUrls: ['./clips-list.component.scss'],
-  providers:[DatePipe]
+  providers: [DatePipe],
 })
 export class ClipsListComponent implements OnInit, OnDestroy {
+  @Input() scrollable = true;
   constructor(public clipService: ClipService) {}
 
   clips: any[] = [];
   sort = new BehaviorSubject<string>('1');
   ngOnInit(): void {
-    //fetchClips();
-
     this.clipService.getClips();
 
-    window.addEventListener('scroll', this.handelScroll);
+    if (this.scrollable) window.addEventListener('scroll', this.handelScroll);
   }
   ngOnDestroy(): void {
-    window.removeEventListener('scroll', this.handelScroll);
+    if (this.scrollable) {
+      window.removeEventListener('scroll', this.handelScroll);
+    }
+
+    this.clipService.pageClips = [];
   }
   handelScroll = () => {
     const { scrollTop, offsetHeight } = document.documentElement;
@@ -35,4 +45,3 @@ export class ClipsListComponent implements OnInit, OnDestroy {
     }
   };
 }
-
