@@ -7,6 +7,9 @@ import firebase from 'firebase/compat/app';
 export class FbTimestampPipe implements PipeTransform {
   constructor(private datePipe: DatePipe) {}
   transform(value: firebase.firestore.FieldValue) {
+    if(!value){
+      return ''
+    }
     const date = (value as firebase.firestore.Timestamp).toDate();
     return this.datePipe.transform(date, 'mediumDate');
   }
