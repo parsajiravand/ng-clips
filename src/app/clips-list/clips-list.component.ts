@@ -1,10 +1,8 @@
 import {
   Component,
-  ElementRef,
   Input,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { ClipService } from '../services/clip.service';
 import { BehaviorSubject } from 'rxjs';
