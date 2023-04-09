@@ -1,3 +1,9 @@
+<p align="center">
+  <br>
+  <strong>
+  <a style="font-size:32px" href="https://best-practice-clip.netlify.app/">🔎 App Demo</a> 
+  </strong>
+</p>
 # Clips
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.4.
