@@ -13,7 +13,6 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 import {
   Resolve,
   ActivatedRouteSnapshot,
-  RouterStateSnapshot,
   Router,
 } from '@angular/router';
 
@@ -102,7 +101,7 @@ export class ClipService implements Resolve<IClip | null> {
     this.pendingRequest = false;
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  resolve(route: ActivatedRouteSnapshot) {
     return this.clipsCollection
       .doc(route.params['id'])
       .get()

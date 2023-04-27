@@ -17,7 +17,7 @@ import { DatePipe } from '@angular/common';
   providers:[DatePipe]
 })
 export class ClipComponent implements OnInit {
-  player?: any;
+  player?: unknown;
   clip?: IClip;
   @ViewChild('videoPlayer', { static: true }) target?: ElementRef;
 

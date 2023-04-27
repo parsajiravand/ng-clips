@@ -32,12 +32,14 @@ export class RegisterComponent {
   password = new FormControl('', [
     Validators.required,
     Validators.pattern(
+      // eslint-disable-next-line no-useless-escape
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
     ),
   ]);
   confirmPassword = new FormControl('', [
     Validators.required,
     Validators.pattern(
+      // eslint-disable-next-line no-useless-escape
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
     ),
   ]);
@@ -66,6 +68,7 @@ export class RegisterComponent {
     this.submitLoading = true;
     try {
       await this.auth.createUser(this.registerForm.value as IUser);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
 

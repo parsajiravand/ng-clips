@@ -41,7 +41,7 @@ export class UploadComponent implements OnDestroy {
 
   // screenshot
   screenshots: string[] = [];
-  selectedScreenshot: string = '0';
+  selectedScreenshot = '0';
   selectedScreenshotIndex = 0;
   screenshotTask?: AngularFireUploadTask;
 

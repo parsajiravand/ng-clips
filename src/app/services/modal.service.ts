@@ -8,8 +8,6 @@ interface IModal {
 export class ModalService {
   private modals: IModal[] = [];
   private visible = false;
-  constructor() {}
-
   register(id: string) {
     this.modals.push({ id, visible: false });
   }

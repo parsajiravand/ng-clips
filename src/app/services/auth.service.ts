@@ -39,7 +39,7 @@ export class AuthService {
     this.router.events
       .pipe(
         filter((event) => event instanceof ActivationEnd),
-        map((e) => this.route.firstChild),
+        map(() => this.route.firstChild),
         switchMap((route) => route?.data ?? of({}))
       )
       .subscribe((data) => {

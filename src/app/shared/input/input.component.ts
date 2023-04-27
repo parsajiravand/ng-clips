@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-input',
@@ -7,7 +7,7 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./input.component.scss'],
 })
 export class InputComponent {
-  @Input() label: string = 'Test';
+  @Input() label = 'Test';
   @Input() type?: string = 'text';
   @Input() control: FormControl = new FormControl({});
   @Input() format= '';

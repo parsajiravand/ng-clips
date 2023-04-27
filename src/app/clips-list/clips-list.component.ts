@@ -18,7 +18,7 @@ export class ClipsListComponent implements OnInit, OnDestroy {
   @Input() scrollable = true;
   constructor(public clipService: ClipService) {}
 
-  clips: any[] = [];
+  clips: unknown[] = [];
   sort = new BehaviorSubject<string>('1');
   ngOnInit(): void {
     this.clipService.getClips();

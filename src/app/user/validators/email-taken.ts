@@ -13,7 +13,7 @@ export class EmailTaken implements AsyncValidator {
   constructor(private auth: AngularFireAuth) {}
 
   validate = (control: AbstractControl): Promise<ValidationErrors | null> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.auth
         .fetchSignInMethodsForEmail(control.value)
         .then((methods) => {
@@ -23,7 +23,7 @@ export class EmailTaken implements AsyncValidator {
             resolve(null);
           }
         })
-        .catch((err) => {
+        .catch(() => {
           resolve(null);
         });
     });

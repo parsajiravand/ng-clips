@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-import { promises } from 'dns';
 
 @Injectable({
   providedIn: 'root',

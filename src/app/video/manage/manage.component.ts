@@ -14,6 +14,7 @@ export class ManageComponent implements OnInit {
   videoOrder = '1';
   clips: IClip[] = [];
   activeClip: IClip | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sort$ = BehaviorSubject as any;
 
   constructor(
