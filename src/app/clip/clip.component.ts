@@ -17,7 +17,8 @@ import { DatePipe } from '@angular/common';
   providers:[DatePipe]
 })
 export class ClipComponent implements OnInit {
-  player?: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  player?: any;
   clip?: IClip;
   @ViewChild('videoPlayer', { static: true }) target?: ElementRef;
 
