@@ -45,11 +45,10 @@ describe('NavComponent', () => {
   it('should logout', () => {
     const logoutLink = fixture.debugElement.query(By.css('.logout'));
     expect(logoutLink).toBeTruthy(); // check if logout method has been called
-    mockedAuthService.logout(); // call logout method
-    expect(mockedAuthService.logout).toHaveBeenCalled(); // check if logout method has been called
+
 
     logoutLink.triggerEventHandler('click', null); // trigger click event
     const service = TestBed.inject(AuthService); // get AuthService from TestBed
-    expect(service.logout).withContext('Could not click logout button').toHaveBeenCalled(1); // check if logout method has been called
+    expect(service.logout).withContext('Could not click logout button').toHaveBeenCalledTimes(1); // check if logout method has been called
   });
 });
